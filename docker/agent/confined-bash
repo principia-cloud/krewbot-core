@@ -1,0 +1,51 @@
+#!/usr/bin/bash.real
+# Wrapper that replaces /usr/bin/bash in the Docker image. Every Bash
+# invocation goes through here. Sets LD_PRELOAD for filesystem confinement
+# and rejects known bypass patterns before exec-ing the real bash.
+
+# Already inside the sandbox (subshell), or no sandbox configured → passthrough
+if [ "$_PROOT_ACTIVE" = "1" ] || [ -z "$SANDBOX_SESSION_ROOT" ]; then
+    exec /usr/bin/bash.real "$@"
+fi
+
+# Block commands that reference the real bash binary directly. Without this,
+# a command like `env -u LD_PRELOAD /usr/bin/bash.real` would bypass the
+# sandbox. The real bash's path is an implementation detail that should not
+# be reachable from model-generated commands.
+case "$*" in
+    *bash.real*)
+        echo "sandbox: command rejected — cannot invoke the unwrapped shell" >&2
+        exit 126
+        ;;
+esac
+
+# Block known LD_PRELOAD bypass patterns. This is best-effort — encoding
+# tricks can evade string matching — but catches the obvious attempts.
+case "$*" in
+    *LD_PRELOAD=*|*LD_PRELOAD\ *|*env\ -i*|*env\ -u\ LD_PRELOAD*|*env\ -u\ \"LD_PRELOAD*|*env\ -u\ \'LD_PRELOAD*)
+        echo "sandbox: command rejected — cannot modify sandbox environment" >&2
+        exit 126
+        ;;
+esac
+
+# Block raw syscall and env-manipulation patterns across interpreters.
+# Covers ctypes (Python), os.environ manipulation, process.env (Node),
+# and dlopen-based approaches. Best-effort — the primary boundary is
+# can_use_tool + gVisor, not this grep.
+_SANDBOX_CMD="$*"
+if printf '%s' "$_SANDBOX_CMD" | grep -qiE '(ctypes\.(CDLL|cdll)|\.syscall\s*\(|from\s+ctypes|import\s+ctypes|os\.environ|process\.env\[|dlopen\s*\()'; then
+    echo "sandbox: command rejected — low-level env/syscall manipulation is not permitted in the sandbox" >&2
+    exit 126
+fi
+
+# Block execution of binaries from /data/ and /tmp/. This catches the case
+# where the model downloads or compiles a binary and tries to run it.
+# Covers: direct invocation, subprocess.run, os.system, etc. — because all
+# of those ultimately go through bash when invoked from the Claude SDK.
+if printf '%s' "$_SANDBOX_CMD" | grep -qE '(/data/|/tmp/)[^ ]*\.(bin|elf|out|exe)|chmod\s+\+x\s+/data/|chmod\s+\+x\s+/tmp/|chmod\s+[0-9]*[1357]\s+/data/|chmod\s+[0-9]*[1357]\s+/tmp/'; then
+    echo "sandbox: command rejected — cannot make files executable on data volumes" >&2
+    exit 126
+fi
+
+export LD_PRELOAD=/app/libsandbox.so
+exec /usr/bin/bash.real "$@"

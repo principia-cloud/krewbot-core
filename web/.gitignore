@@ -1,0 +1,5 @@
+node_modules/
+dist/
+.vercel
+.vite/
+posthog-setup-report.md

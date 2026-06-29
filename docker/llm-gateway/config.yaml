@@ -1,0 +1,42 @@
+# LiteLLM proxy config for the credential-isolating LLM gateway (Fargate).
+#
+# - Presents an Anthropic-compatible /v1/messages (+ count_tokens) endpoint that
+#   Claude Code talks to via ANTHROPIC_BASE_URL.
+# - Translates to the Bedrock Converse API using the Fargate task role's AWS
+#   credentials (boto3 default chain) — never from the client.
+# - Auth + monthly hard-cap + usage accounting in litellm_hooks (over gateway_core).
+#
+# IMPORTANT: only list models the gateway can AUTHORITATIVELY price
+# (gateway_core.BEDROCK_PRICES_PER_1M). There is intentionally NO "*" wildcard:
+# a catch-all would route unmapped models to a priced target and silently bypass
+# the fail-closed pricing/budget gate. Unmapped models are rejected pre-call.
+#
+# `model_name` is the alias the client sends as ANTHROPIC_MODEL, kept equal to
+# the "bedrock/<id>" litellm model. Region from AWS_REGION (set by the task).
+
+model_list:
+  - model_name: bedrock/moonshotai.kimi-k2.5
+    litellm_params:
+      model: bedrock/moonshotai.kimi-k2.5
+      aws_region_name: os.environ/AWS_REGION
+  - model_name: bedrock/deepseek.v3.2
+    litellm_params:
+      model: bedrock/deepseek.v3.2
+      aws_region_name: os.environ/AWS_REGION
+  - model_name: bedrock/amazon.nova-lite-v1:0
+    litellm_params:
+      model: bedrock/amazon.nova-lite-v1:0
+      aws_region_name: os.environ/AWS_REGION
+  - model_name: bedrock/amazon.nova-micro-v1:0
+    litellm_params:
+      model: bedrock/amazon.nova-micro-v1:0
+      aws_region_name: os.environ/AWS_REGION
+
+litellm_settings:
+  # CustomLogger that attributes cost/tokens to the calling workspace.
+  callbacks: ["litellm_hooks.usage_logger_instance"]
+  drop_params: true
+
+general_settings:
+  # Per-request workspace-token validation + fail-closed budget enforcement.
+  custom_auth: litellm_hooks.user_api_key_auth

@@ -1,0 +1,40 @@
+{
+  "name": "@krewbot/platform-core",
+  "version": "0.0.1",
+  "description": "Self-hosted core for the krewbot platform — CDK stacks and Lambda code intended to be deployable into a customer-owned AWS account.",
+  "license": "Apache-2.0",
+  "main": "dist/lib/index.js",
+  "types": "dist/lib/index.d.ts",
+  "files": [
+    "dist/**",
+    "lib/**",
+    "lambda/**",
+    "docker/**",
+    "assets/**",
+    "scripts/**",
+    "shared/**",
+    "web/**",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "build:chat-server": "cd docker/agent/chat-server && npm install --no-audit --no-fund && npm run build",
+    "build:all": "npm run build && npm run build:chat-server",
+    "prepare": "npm run build:all",
+    "test:cdk": "tsc && node --test tests/cdk/*.test.cjs",
+    "test:python": "pytest tests/python -v",
+    "test": "npm run test:cdk && npm run test:python"
+  },
+  "dependencies": {
+    "aws-cdk-lib": "^2.170.0",
+    "constructs": "^10.5.0"
+  },
+  "peerDependencies": {
+    "aws-cdk-lib": "^2.100.0",
+    "constructs": "^10.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.4.0"
+  }
+}

@@ -1,0 +1,1036 @@
+{
+  "ecr": {
+    "parameters": {
+      "BootstrapVersion": {
+        "Type": "AWS::SSM::Parameter::Value<String>",
+        "Default": "/cdk-bootstrap/hnb659fds/version"
+      }
+    },
+    "resources": {
+      "selfhostagent2619B3D3": {
+        "Type": "AWS::ECR::Repository",
+        "Properties": {
+          "RepositoryName": "selfhost-agent"
+        }
+      },
+      "selfhostsidecar239E970A": {
+        "Type": "AWS::ECR::Repository",
+        "Properties": {
+          "RepositoryName": "selfhost-sidecar"
+        }
+      },
+      "selfhostllmgateway876224F6": {
+        "Type": "AWS::ECR::Repository",
+        "Properties": {
+          "RepositoryName": "selfhost-llm-gateway"
+        }
+      }
+    }
+  },
+  "storage": {
+    "parameters": {
+      "BootstrapVersion": {
+        "Type": "AWS::SSM::Parameter::Value<String>",
+        "Default": "/cdk-bootstrap/hnb659fds/version"
+      }
+    },
+    "resources": {
+      "SandboxEfsFCD50474": {
+        "Type": "AWS::EFS::FileSystem",
+        "Properties": {}
+      },
+      "SandboxEfsEfsMountTarget1A65A3CED": {
+        "Type": "AWS::EFS::MountTarget",
+        "Properties": {}
+      },
+      "SandboxEfsEfsMountTarget23A5A33C9": {
+        "Type": "AWS::EFS::MountTarget",
+        "Properties": {}
+      },
+      "Workspaces72022D37": {
+        "Type": "AWS::DynamoDB::Table",
+        "Properties": {
+          "TableName": "selfhost-workspaces"
+        }
+      },
+      "WorkspaceMembers63DF8800": {
+        "Type": "AWS::DynamoDB::Table",
+        "Properties": {
+          "TableName": "selfhost-workspace-members"
+        }
+      },
+      "ChatDirectory8CCCE25A": {
+        "Type": "AWS::DynamoDB::Table",
+        "Properties": {
+          "TableName": "selfhost-chat-directory"
+        }
+      },
+      "Agents8DC46436": {
+        "Type": "AWS::DynamoDB::Table",
+        "Properties": {
+          "TableName": "selfhost-agents"
+        }
+      },
+      "LlmUsage7B648353": {
+        "Type": "AWS::DynamoDB::Table",
+        "Properties": {
+          "TableName": "selfhost-llm-usage"
+        }
+      }
+    }
+  },
+  "cluster": {
+    "parameters": {
+      "SsmParameterValueawsserviceecsoptimizedamiamazonlinux2023arm64recommendedimageidC96584B6F00A464EAD1953AFF4B05118Parameter": {
+        "Type": "AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>",
+        "Default": "/aws/service/ecs/optimized-ami/amazon-linux-2023/arm64/recommended/image_id"
+      },
+      "BootstrapVersion": {
+        "Type": "AWS::SSM::Parameter::Value<String>",
+        "Default": "/cdk-bootstrap/hnb659fds/version"
+      }
+    },
+    "resources": {
+      "SandboxClusterB2BA267F": {
+        "Type": "AWS::ECS::Cluster",
+        "Properties": {
+          "ClusterName": "selfhost-cluster"
+        }
+      },
+      "SandboxCluster4005BEBB": {
+        "Type": "AWS::ECS::ClusterCapacityProviderAssociations",
+        "Properties": {}
+      },
+      "EcsInstanceRole28EECAF6": {
+        "Type": "AWS::IAM::Role",
+        "Properties": {}
+      },
+      "EcsInstanceRoleDefaultPolicy6683DEF9": {
+        "Type": "AWS::IAM::Policy",
+        "Properties": {}
+      },
+      "EcsLaunchTemplateProfile65A2C189": {
+        "Type": "AWS::IAM::InstanceProfile",
+        "Properties": {}
+      },
+      "EcsLaunchTemplate7E4D9BA7": {
+        "Type": "AWS::EC2::LaunchTemplate",
+        "Properties": {}
+      },
+      "EcsAsgASGCEE1FA21": {
+        "Type": "AWS::AutoScaling::AutoScalingGroup",
+        "Properties": {}
+      },
+      "AsgCapacityProvider760D11D9": {
+        "Type": "AWS::ECS::CapacityProvider",
+        "Properties": {}
+      },
+      "TurnQueueConfig555A15AB": {
+        "Type": "AWS::SSM::Parameter",
+        "Properties": {
+          "Name": "/selfhost/platform-config"
+        }
+      }
+    }
+  },
+  "dataPlane": {
+    "parameters": {
+      "BootstrapVersion": {
+        "Type": "AWS::SSM::Parameter::Value<String>",
+        "Default": "/cdk-bootstrap/hnb659fds/version"
+      }
+    },
+    "resources": {
+      "Alb16C2F182": {
+        "Type": "AWS::ElasticLoadBalancingV2::LoadBalancer",
+        "Properties": {
+          "Name": "selfhost-dataplane"
+        }
+      },
+      "AlbHttpListener00C8B33E": {
+        "Type": "AWS::ElasticLoadBalancingV2::Listener",
+        "Properties": {}
+      },
+      "AlbHttpsListener2ADA614F": {
+        "Type": "AWS::ElasticLoadBalancingV2::Listener",
+        "Properties": {}
+      }
+    }
+  },
+  "agentPlatform": {
+    "parameters": {
+      "BootstrapVersion": {
+        "Type": "AWS::SSM::Parameter::Value<String>",
+        "Default": "/cdk-bootstrap/hnb659fds/version"
+      }
+    },
+    "resources": {
+      "AgentPlatformAuthorizerFnServiceRole6F8ACA83": {
+        "Type": "AWS::IAM::Role",
+        "Properties": {}
+      },
+      "AgentPlatformAuthorizerFnServiceRoleDefaultPolicyB42197DD": {
+        "Type": "AWS::IAM::Policy",
+        "Properties": {}
+      },
+      "AgentPlatformAuthorizerFnC69A2B17": {
+        "Type": "AWS::Lambda::Function",
+        "Properties": {
+          "Environment": {
+            "Variables": {
+              "POWERTOOLS_SERVICE_NAME": "agent-platform-authorizer",
+              "POWERTOOLS_LOG_LEVEL": "INFO",
+              "POWERTOOLS_LOGGER_LOG_EVENT": "false",
+              "PLATFORM_ENV": "prod",
+              "WORKSPACE_SECRETS_PREFIX": "selfhost"
+            }
+          }
+        }
+      },
+      "AgentPlatformApiFnServiceRoleA28EE070": {
+        "Type": "AWS::IAM::Role",
+        "Properties": {}
+      },
+      "AgentPlatformApiFnServiceRoleDefaultPolicyCE8E9D30": {
+        "Type": "AWS::IAM::Policy",
+        "Properties": {}
+      },
+      "AgentPlatformApiFnD06EAA25": {
+        "Type": "AWS::Lambda::Function",
+        "Properties": {
+          "Environment": {
+            "Variables": {
+              "WORKSPACES_TABLE": {
+                "Fn::ImportValue": "Storage:ExportsOutputRefWorkspaces72022D37A407F0AE"
+              },
+              "MEMBERS_TABLE": {
+                "Fn::ImportValue": "Storage:ExportsOutputRefWorkspaceMembers63DF8800365C5959"
+              },
+              "CHAT_DIRECTORY_TABLE": {
+                "Fn::ImportValue": "Storage:ExportsOutputRefChatDirectory8CCCE25A29EF9D11"
+              },
+              "AGENTS_TABLE": {
+                "Fn::ImportValue": "Storage:ExportsOutputRefAgents8DC464362D42D1C3"
+              },
+              "AWS_ACCOUNT_ID": "123456789012",
+              "POWERTOOLS_SERVICE_NAME": "agent-platform-api",
+              "POWERTOOLS_LOG_LEVEL": "INFO",
+              "POWERTOOLS_LOGGER_LOG_EVENT": "false",
+              "PLATFORM_ENV": "prod",
+              "WORKSPACE_SECRETS_PREFIX": "selfhost",
+              "WORKSPACE_SSM_PREFIX": "/selfhost",
+              "CRON_DESTINATION_PREFIX": "selfhost-cron-dest",
+              "CRON_INVOKE_ROLE_PREFIX": "selfhost-cron-invoke",
+              "CRON_RULE_PREFIX": "selfhost-cron",
+              "LANGFUSE_PLATFORM_SECRET": "selfhost/platform/langfuse-keys",
+              "LLM_USAGE_TABLE": {
+                "Fn::ImportValue": "Storage:ExportsOutputRefLlmUsage7B648353B8DB315B"
+              }
+            }
+          }
+        }
+      },
+      "AgentPlatformApi84D32BAE": {
+        "Type": "AWS::ApiGatewayV2::Api",
+        "Properties": {
+          "Name": "selfhost-agent-platform-api"
+        }
+      },
+      "AgentPlatformApiDefaultStageE53C68C7": {
+        "Type": "AWS::ApiGatewayV2::Stage",
+        "Properties": {}
+      },
+      "AgentPlatformApiGETworkspaceAgentPlatformInt025E8C20": {
+        "Type": "AWS::ApiGatewayV2::Integration",
+        "Properties": {}
+      },
+      "AgentPlatformApiGETworkspaceAgentPlatformIntPermission1C1607BF": {
+        "Type": "AWS::Lambda::Permission",
+        "Properties": {}
+      },
+      "AgentPlatformApiGETworkspaceF44E316A": {
+        "Type": "AWS::ApiGatewayV2::Route",
+        "Properties": {}
+      },
+      "AgentPlatformApiAgentPlatformAuthorizerF5D321AD": {
+        "Type": "AWS::ApiGatewayV2::Authorizer",
+        "Properties": {
+          "Name": "AgentPlatformAuthorizer"
+        }
+      },
+      "AgentPlatformApiAgentPlatformApiAgentPlatformAuthorizerCC5BD106Permission5441B8DB": {
+        "Type": "AWS::Lambda::Permission",
+        "Properties": {}
+      },
+      "AgentPlatformApiGETllmgatewayusageAgentPlatformIntPermission6441FFBA": {
+        "Type": "AWS::Lambda::Permission",
+        "Properties": {}
+      },
+      "AgentPlatformApiGETllmgatewayusage7193A9BA": {
+        "Type": "AWS::ApiGatewayV2::Route",
+        "Properties": {}
+      },
+      "AgentPlatformApiPOSTusageturnsAgentPlatformIntPermissionDB52DB0F": {
+        "Type": "AWS::Lambda::Permission",
+        "Properties": {}
+      },
+      "AgentPlatformApiPOSTusageturnsBA07DB55": {
+        "Type": "AWS::ApiGatewayV2::Route",
+        "Properties": {}
+      },
+      "AgentPlatformApiGETusageAgentPlatformIntPermissionF3953E9F": {
+        "Type": "AWS::Lambda::Permission",
+        "Properties": {}
+      },
+      "AgentPlatformApiGETusage1FAF731E": {
+        "Type": "AWS::ApiGatewayV2::Route",
+        "Properties": {}
+      },
+      "AgentPlatformApiGETusageturnsAgentPlatformIntPermission74CDEAEA": {
+        "Type": "AWS::Lambda::Permission",
+        "Properties": {}
+      },
+      "AgentPlatformApiGETusageturns8EE53447": {
+        "Type": "AWS::ApiGatewayV2::Route",
+        "Properties": {}
+      },
+      "AgentPlatformApiGETusagesessionAgentPlatformIntPermissionFF4CBA07": {
+        "Type": "AWS::Lambda::Permission",
+        "Properties": {}
+      },
+      "AgentPlatformApiGETusagesession6A035CAE": {
+        "Type": "AWS::ApiGatewayV2::Route",
+        "Properties": {}
+      },
+      "AgentPlatformApiGETmembersAgentPlatformIntPermission3742448E": {
+        "Type": "AWS::Lambda::Permission",
+        "Properties": {}
+      },
+      "AgentPlatformApiGETmembers0352C36A": {
+        "Type": "AWS::ApiGatewayV2::Route",
+        "Properties": {}
+      },
+      "AgentPlatformApiGETcronjobsAgentPlatformIntPermissionBC653F4B": {
+        "Type": "AWS::Lambda::Permission",
+        "Properties": {}
+      },
+      "AgentPlatformApiGETcronjobsBD64E458": {
+        "Type": "AWS::ApiGatewayV2::Route",
+        "Properties": {}
+      },
+      "AgentPlatformApiPOSTcronjobsAgentPlatformIntPermission0A5F44AA": {
+        "Type": "AWS::Lambda::Permission",
+        "Properties": {}
+      },
+      "AgentPlatformApiPOSTcronjobs6A950F98": {
+        "Type": "AWS::ApiGatewayV2::Route",
+        "Properties": {}
+      },
+      "AgentPlatformApiDELETEcronjobsjobNameAgentPlatformIntPermissionD95BF57A": {
+        "Type": "AWS::Lambda::Permission",
+        "Properties": {}
+      },
+      "AgentPlatformApiDELETEcronjobsjobName7CF66564": {
+        "Type": "AWS::ApiGatewayV2::Route",
+        "Properties": {}
+      },
+      "AgentPlatformApiGETchatsAgentPlatformIntPermissionEC247DA1": {
+        "Type": "AWS::Lambda::Permission",
+        "Properties": {}
+      },
+      "AgentPlatformApiGETchats4921655D": {
+        "Type": "AWS::ApiGatewayV2::Route",
+        "Properties": {}
+      },
+      "AgentPlatformApiGETpeopleAgentPlatformIntPermission7262D881": {
+        "Type": "AWS::Lambda::Permission",
+        "Properties": {}
+      },
+      "AgentPlatformApiGETpeople51C3D23B": {
+        "Type": "AWS::ApiGatewayV2::Route",
+        "Properties": {}
+      },
+      "AgentPlatformApiPOSTchatdirectoryobservationsAgentPlatformIntPermission7C6FFAD0": {
+        "Type": "AWS::Lambda::Permission",
+        "Properties": {}
+      },
+      "AgentPlatformApiPOSTchatdirectoryobservations56BF51BB": {
+        "Type": "AWS::ApiGatewayV2::Route",
+        "Properties": {}
+      },
+      "AgentPlatformApiGETworkspaceagentsAgentPlatformIntPermissionB355C503": {
+        "Type": "AWS::Lambda::Permission",
+        "Properties": {}
+      },
+      "AgentPlatformApiGETworkspaceagentsDF0B938B": {
+        "Type": "AWS::ApiGatewayV2::Route",
+        "Properties": {}
+      },
+      "AgentPlatformApiPUTagentsagentIdmetadataAgentPlatformIntPermission3DB5D340": {
+        "Type": "AWS::Lambda::Permission",
+        "Properties": {}
+      },
+      "AgentPlatformApiPUTagentsagentIdmetadataFC1FAF90": {
+        "Type": "AWS::ApiGatewayV2::Route",
+        "Properties": {}
+      },
+      "AgentPlatformApiPOSTagentsagentIdstatusAgentPlatformIntPermissionB18A9DC7": {
+        "Type": "AWS::Lambda::Permission",
+        "Properties": {}
+      },
+      "AgentPlatformApiPOSTagentsagentIdstatus1190ECEC": {
+        "Type": "AWS::ApiGatewayV2::Route",
+        "Properties": {}
+      },
+      "AgentPlatformApiPOSTworkspacecustomsecretsAgentPlatformIntPermission293EC3ED": {
+        "Type": "AWS::Lambda::Permission",
+        "Properties": {}
+      },
+      "AgentPlatformApiPOSTworkspacecustomsecretsBE8229F1": {
+        "Type": "AWS::ApiGatewayV2::Route",
+        "Properties": {}
+      },
+      "AgentPlatformApiDELETEworkspacecustomsecretsnameAgentPlatformIntPermission0F603DCE": {
+        "Type": "AWS::Lambda::Permission",
+        "Properties": {}
+      },
+      "AgentPlatformApiDELETEworkspacecustomsecretsname2BCDA2DE": {
+        "Type": "AWS::ApiGatewayV2::Route",
+        "Properties": {}
+      },
+      "AgentPlatformApiPOSTbrowsersessionsAgentPlatformIntPermissionF674B623": {
+        "Type": "AWS::Lambda::Permission",
+        "Properties": {}
+      },
+      "AgentPlatformApiPOSTbrowsersessions714A0CD6": {
+        "Type": "AWS::ApiGatewayV2::Route",
+        "Properties": {}
+      },
+      "AgentPlatformApiGETbrowsersessionscurrentAgentPlatformIntPermissionACA235D7": {
+        "Type": "AWS::Lambda::Permission",
+        "Properties": {}
+      },
+      "AgentPlatformApiGETbrowsersessionscurrentDD576D4E": {
+        "Type": "AWS::ApiGatewayV2::Route",
+        "Properties": {}
+      },
+      "AgentPlatformApiDELETEbrowsersessionssessionIdAgentPlatformIntPermission43209051": {
+        "Type": "AWS::Lambda::Permission",
+        "Properties": {}
+      },
+      "AgentPlatformApiDELETEbrowsersessionssessionIdCB87A970": {
+        "Type": "AWS::ApiGatewayV2::Route",
+        "Properties": {}
+      },
+      "AgentPlatformApiGETbrowsercookiesAgentPlatformIntPermissionC314FF97": {
+        "Type": "AWS::Lambda::Permission",
+        "Properties": {}
+      },
+      "AgentPlatformApiGETbrowsercookiesC38E0820": {
+        "Type": "AWS::ApiGatewayV2::Route",
+        "Properties": {}
+      },
+      "AgentPlatformApiPOSTbrowsersessionssessionIdsaveprofileAgentPlatformIntPermission5CDC6E13": {
+        "Type": "AWS::Lambda::Permission",
+        "Properties": {}
+      },
+      "AgentPlatformApiPOSTbrowsersessionssessionIdsaveprofileB122C922": {
+        "Type": "AWS::ApiGatewayV2::Route",
+        "Properties": {}
+      },
+      "AgentPlatformApiPOSTlangfuseapipublicingestionAgentPlatformIntPermission580FBC84": {
+        "Type": "AWS::Lambda::Permission",
+        "Properties": {}
+      },
+      "AgentPlatformApiPOSTlangfuseapipublicingestion0FF74759": {
+        "Type": "AWS::ApiGatewayV2::Route",
+        "Properties": {}
+      }
+    }
+  },
+  "management": {
+    "parameters": {
+      "BootstrapVersion": {
+        "Type": "AWS::SSM::Parameter::Value<String>",
+        "Default": "/cdk-bootstrap/hnb659fds/version"
+      }
+    },
+    "resources": {
+      "WorkspaceCfnExecutionRole91EFC346": {
+        "Type": "AWS::IAM::Role",
+        "Properties": {}
+      },
+      "WorkspaceCfnExecutionRoleDefaultPolicy2EE5DEC1": {
+        "Type": "AWS::IAM::Policy",
+        "Properties": {}
+      },
+      "ProvisionFnServiceRole03839902": {
+        "Type": "AWS::IAM::Role",
+        "Properties": {}
+      },
+      "ProvisionFnServiceRoleDefaultPolicyA14E575F": {
+        "Type": "AWS::IAM::Policy",
+        "Properties": {}
+      },
+      "ProvisionFn9721398D": {
+        "Type": "AWS::Lambda::Function",
+        "Properties": {
+          "Environment": {
+            "Variables": {
+              "WORKSPACES_TABLE": {
+                "Fn::ImportValue": "Storage:ExportsOutputRefWorkspaces72022D37A407F0AE"
+              },
+              "MEMBERS_TABLE": {
+                "Fn::ImportValue": "Storage:ExportsOutputRefWorkspaceMembers63DF8800365C5959"
+              },
+              "PLATFORM_ENV": "prod",
+              "WORKSPACE_SECRETS_PREFIX": "selfhost",
+              "WORKSPACE_SSM_PREFIX": "/selfhost",
+              "CRON_RULE_PREFIX": "selfhost-cron",
+              "WORKSPACE_STACK_PREFIX": "Selfhost-Workspace",
+              "PLATFORM_CONFIG_SSM_NAME": "/selfhost/platform-config",
+              "LOG_LEVEL": "INFO",
+              "WORKSPACE_TEMPLATE_URL": {
+                "Fn::Sub": "https://s3.us-east-1.${AWS::URLSuffix}/cdk-hnb659fds-assets-123456789012-us-east-1/c5c29926c7f7436b1a83224544c31ae5b4c4abeaf71d82965530c0ed3795b73a.json"
+              },
+              "FILE_SYSTEM_ID": {
+                "Fn::ImportValue": "Storage:ExportsOutputRefSandboxEfsFCD5047496324858"
+              },
+              "CLUSTER_NAME": "selfhost-cluster",
+              "VPC_ID": {
+                "Fn::ImportValue": "Network:ExportsOutputRefSandboxVpcAAA107BE8A7837CA"
+              },
+              "SUBNET_ID": {
+                "Fn::ImportValue": "Network:ExportsOutputRefSandboxVpcPublicSubnet1Subnet3E135B45BBC51468"
+              },
+              "SIDECAR_SG_ID": {
+                "Fn::ImportValue": "Network:ExportsOutputFnGetAttSidecarSg367C67F6GroupId86885780"
+              },
+              "AGENT_REPO_ARN": {
+                "Fn::ImportValue": "Ecr:ExportsOutputFnGetAttselfhostagent2619B3D3ArnF0AAD865"
+              },
+              "SIDECAR_REPO_ARN": {
+                "Fn::ImportValue": "Ecr:ExportsOutputFnGetAttselfhostsidecar239E970AArn09AD576F"
+              },
+              "JWKS_URL": {
+                "Fn::Join": [
+                  "",
+                  [
+                    "https://cognito-idp.us-east-1.amazonaws.com/",
+                    {
+                      "Fn::ImportValue": "Deps:ExportsOutputRefUserPool6BA7E5F296FD7236"
+                    },
+                    "/.well-known/jwks.json"
+                  ]
+                ]
+              },
+              "ALB_LISTENER_ARN": "arn:aws:elasticloadbalancing:us-east-1:123456789012:listener/app/example/1/2",
+              "DOMAIN_NAME": "ws.example.test",
+              "COGNITO_USER_POOL_ID": {
+                "Fn::ImportValue": "Deps:ExportsOutputRefUserPool6BA7E5F296FD7236"
+              },
+              "COGNITO_CLIENT_ID": {
+                "Fn::ImportValue": "Deps:ExportsOutputRefUserPoolUserPoolClient40176907044A36CF"
+              },
+              "AGENT_PLATFORM_API_URL": "https://agent-platform.example.test",
+              "LLM_GATEWAY_URL": "https://llm-gateway.ws.example.test",
+              "APP_URL": "https://app.example.test",
+              "AGENT_NAME": "selfhost-agent",
+              "MANAGED_BY_TAG": "selfhost",
+              "WORKSPACE_CFN_EXEC_ROLE_ARN": {
+                "Fn::GetAtt": [
+                  "WorkspaceCfnExecutionRole91EFC346",
+                  "Arn"
+                ]
+              }
+            }
+          }
+        }
+      },
+      "PostProvisionFnServiceRole67AF4CC9": {
+        "Type": "AWS::IAM::Role",
+        "Properties": {}
+      },
+      "PostProvisionFnServiceRoleDefaultPolicyFCFD964F": {
+        "Type": "AWS::IAM::Policy",
+        "Properties": {}
+      },
+      "PostProvisionFn4883A021": {
+        "Type": "AWS::Lambda::Function",
+        "Properties": {
+          "Environment": {
+            "Variables": {
+              "WORKSPACES_TABLE": {
+                "Fn::ImportValue": "Storage:ExportsOutputRefWorkspaces72022D37A407F0AE"
+              },
+              "MEMBERS_TABLE": {
+                "Fn::ImportValue": "Storage:ExportsOutputRefWorkspaceMembers63DF8800365C5959"
+              },
+              "PLATFORM_ENV": "prod",
+              "WORKSPACE_SECRETS_PREFIX": "selfhost",
+              "WORKSPACE_SSM_PREFIX": "/selfhost",
+              "CRON_RULE_PREFIX": "selfhost-cron",
+              "WORKSPACE_STACK_PREFIX": "Selfhost-Workspace",
+              "PLATFORM_CONFIG_SSM_NAME": "/selfhost/platform-config",
+              "LOG_LEVEL": "INFO"
+            }
+          }
+        }
+      },
+      "DeprovisionFnServiceRole06362602": {
+        "Type": "AWS::IAM::Role",
+        "Properties": {}
+      },
+      "DeprovisionFnServiceRoleDefaultPolicyE6B7B2DB": {
+        "Type": "AWS::IAM::Policy",
+        "Properties": {}
+      },
+      "DeprovisionFn50D7FCD1": {
+        "Type": "AWS::Lambda::Function",
+        "Properties": {
+          "Environment": {
+            "Variables": {
+              "WORKSPACES_TABLE": {
+                "Fn::ImportValue": "Storage:ExportsOutputRefWorkspaces72022D37A407F0AE"
+              },
+              "MEMBERS_TABLE": {
+                "Fn::ImportValue": "Storage:ExportsOutputRefWorkspaceMembers63DF8800365C5959"
+              },
+              "PLATFORM_ENV": "prod",
+              "WORKSPACE_SECRETS_PREFIX": "selfhost",
+              "WORKSPACE_SSM_PREFIX": "/selfhost",
+              "CRON_RULE_PREFIX": "selfhost-cron",
+              "WORKSPACE_STACK_PREFIX": "Selfhost-Workspace",
+              "PLATFORM_CONFIG_SSM_NAME": "/selfhost/platform-config",
+              "LOG_LEVEL": "INFO",
+              "WORKSPACE_CFN_EXEC_ROLE_ARN": {
+                "Fn::GetAtt": [
+                  "WorkspaceCfnExecutionRole91EFC346",
+                  "Arn"
+                ]
+              }
+            }
+          }
+        }
+      },
+      "PostDeprovisionFnServiceRoleF0ECDC31": {
+        "Type": "AWS::IAM::Role",
+        "Properties": {}
+      },
+      "PostDeprovisionFnServiceRoleDefaultPolicyF74233EC": {
+        "Type": "AWS::IAM::Policy",
+        "Properties": {}
+      },
+      "PostDeprovisionFn132C0D80": {
+        "Type": "AWS::Lambda::Function",
+        "Properties": {
+          "Environment": {
+            "Variables": {
+              "WORKSPACES_TABLE": {
+                "Fn::ImportValue": "Storage:ExportsOutputRefWorkspaces72022D37A407F0AE"
+              },
+              "MEMBERS_TABLE": {
+                "Fn::ImportValue": "Storage:ExportsOutputRefWorkspaceMembers63DF8800365C5959"
+              },
+              "PLATFORM_ENV": "prod",
+              "WORKSPACE_SECRETS_PREFIX": "selfhost",
+              "WORKSPACE_SSM_PREFIX": "/selfhost",
+              "CRON_RULE_PREFIX": "selfhost-cron",
+              "WORKSPACE_STACK_PREFIX": "Selfhost-Workspace",
+              "PLATFORM_CONFIG_SSM_NAME": "/selfhost/platform-config",
+              "LOG_LEVEL": "INFO"
+            }
+          }
+        }
+      },
+      "ProvisionStateMachineRole4FB8C692": {
+        "Type": "AWS::IAM::Role",
+        "Properties": {}
+      },
+      "ProvisionStateMachineRoleDefaultPolicyEB6F833C": {
+        "Type": "AWS::IAM::Policy",
+        "Properties": {}
+      },
+      "ProvisionStateMachine524DFEE2": {
+        "Type": "AWS::StepFunctions::StateMachine",
+        "Properties": {
+          "StateMachineName": "selfhost-provision"
+        }
+      },
+      "DeprovisionStateMachineRole1886C1D1": {
+        "Type": "AWS::IAM::Role",
+        "Properties": {}
+      },
+      "DeprovisionStateMachineRoleDefaultPolicy38671A38": {
+        "Type": "AWS::IAM::Policy",
+        "Properties": {}
+      },
+      "DeprovisionStateMachineEB34E808": {
+        "Type": "AWS::StepFunctions::StateMachine",
+        "Properties": {
+          "StateMachineName": "selfhost-deprovision"
+        }
+      },
+      "WorkspaceApiFnServiceRole949A887F": {
+        "Type": "AWS::IAM::Role",
+        "Properties": {}
+      },
+      "WorkspaceApiFnServiceRoleDefaultPolicyF0D6ECBC": {
+        "Type": "AWS::IAM::Policy",
+        "Properties": {}
+      },
+      "WorkspaceApiFn904B9CF3": {
+        "Type": "AWS::Lambda::Function",
+        "Properties": {
+          "Environment": {
+            "Variables": {
+              "WORKSPACES_TABLE": {
+                "Fn::ImportValue": "Storage:ExportsOutputRefWorkspaces72022D37A407F0AE"
+              },
+              "MEMBERS_TABLE": {
+                "Fn::ImportValue": "Storage:ExportsOutputRefWorkspaceMembers63DF8800365C5959"
+              },
+              "AGENTS_TABLE": {
+                "Fn::ImportValue": "Storage:ExportsOutputRefAgents8DC464362D42D1C3"
+              },
+              "PROVISION_STATE_MACHINE_ARN": {
+                "Ref": "ProvisionStateMachine524DFEE2"
+              },
+              "DEPROVISION_STATE_MACHINE_ARN": {
+                "Ref": "DeprovisionStateMachineEB34E808"
+              },
+              "POWERTOOLS_SERVICE_NAME": "workspace-api",
+              "POWERTOOLS_LOG_LEVEL": "INFO",
+              "POWERTOOLS_LOGGER_LOG_EVENT": "false",
+              "PLATFORM_ENV": "prod",
+              "WORKSPACE_SECRETS_PREFIX": "selfhost",
+              "WORKSPACE_SSM_PREFIX": "/selfhost",
+              "CRON_RULE_PREFIX": "selfhost-cron",
+              "GOOGLE_OAUTH_SECRET_NAME": "selfhost/google-oauth",
+              "MICROSOFT_OAUTH_SECRET_NAME": "selfhost/microsoft-oauth",
+              "APP_URL": "https://app.example.test"
+            }
+          }
+        }
+      },
+      "ManagementApiC25F7DA3": {
+        "Type": "AWS::ApiGatewayV2::Api",
+        "Properties": {
+          "Name": "selfhost-management-api"
+        }
+      },
+      "ManagementApiDefaultStage1DFD5772": {
+        "Type": "AWS::ApiGatewayV2::Stage",
+        "Properties": {}
+      },
+      "ManagementApiPOSTworkspacesWorkspaceApiInt5554662E": {
+        "Type": "AWS::ApiGatewayV2::Integration",
+        "Properties": {}
+      },
+      "ManagementApiPOSTworkspacesWorkspaceApiIntPermission996C551E": {
+        "Type": "AWS::Lambda::Permission",
+        "Properties": {}
+      },
+      "ManagementApiPOSTworkspaces6F20BA1A": {
+        "Type": "AWS::ApiGatewayV2::Route",
+        "Properties": {}
+      },
+      "ManagementApiCognitoAuthorizer888A22B9": {
+        "Type": "AWS::ApiGatewayV2::Authorizer",
+        "Properties": {
+          "Name": "CognitoAuthorizer"
+        }
+      },
+      "ManagementApiGETworkspacesworkspaceIdWorkspaceApiIntPermission74A35197": {
+        "Type": "AWS::Lambda::Permission",
+        "Properties": {}
+      },
+      "ManagementApiGETworkspacesworkspaceIdAD7099A9": {
+        "Type": "AWS::ApiGatewayV2::Route",
+        "Properties": {}
+      },
+      "ManagementApiPATCHworkspacesworkspaceIdWorkspaceApiIntPermission4E5A7258": {
+        "Type": "AWS::Lambda::Permission",
+        "Properties": {}
+      },
+      "ManagementApiPATCHworkspacesworkspaceId25B427FF": {
+        "Type": "AWS::ApiGatewayV2::Route",
+        "Properties": {}
+      },
+      "ManagementApiDELETEworkspacesworkspaceIdWorkspaceApiIntPermission182EF8BB": {
+        "Type": "AWS::Lambda::Permission",
+        "Properties": {}
+      },
+      "ManagementApiDELETEworkspacesworkspaceId4D564702": {
+        "Type": "AWS::ApiGatewayV2::Route",
+        "Properties": {}
+      },
+      "ManagementApiGETmeworkspacesWorkspaceApiIntPermission35F7D4A0": {
+        "Type": "AWS::Lambda::Permission",
+        "Properties": {}
+      },
+      "ManagementApiGETmeworkspacesFDDDFD35": {
+        "Type": "AWS::ApiGatewayV2::Route",
+        "Properties": {}
+      },
+      "ManagementApiPOSTworkspacesworkspaceIdmembersWorkspaceApiIntPermission52B514EB": {
+        "Type": "AWS::Lambda::Permission",
+        "Properties": {}
+      },
+      "ManagementApiPOSTworkspacesworkspaceIdmembers86C18FE0": {
+        "Type": "AWS::ApiGatewayV2::Route",
+        "Properties": {}
+      },
+      "ManagementApiDELETEworkspacesworkspaceIdmembersuserIdWorkspaceApiIntPermission09377645": {
+        "Type": "AWS::Lambda::Permission",
+        "Properties": {}
+      },
+      "ManagementApiDELETEworkspacesworkspaceIdmembersuserIdE1CFD097": {
+        "Type": "AWS::ApiGatewayV2::Route",
+        "Properties": {}
+      },
+      "ManagementApiGETworkspacesworkspaceIdmembersWorkspaceApiIntPermission98B2C81A": {
+        "Type": "AWS::Lambda::Permission",
+        "Properties": {}
+      },
+      "ManagementApiGETworkspacesworkspaceIdmembersCDD37F5B": {
+        "Type": "AWS::ApiGatewayV2::Route",
+        "Properties": {}
+      },
+      "ManagementApiPATCHworkspacesworkspaceIdmembersmetelegramWorkspaceApiIntPermission68DDA555": {
+        "Type": "AWS::Lambda::Permission",
+        "Properties": {}
+      },
+      "ManagementApiPATCHworkspacesworkspaceIdmembersmetelegram2D47A477": {
+        "Type": "AWS::ApiGatewayV2::Route",
+        "Properties": {}
+      },
+      "ManagementApiGETworkspacesworkspaceIdintegrationsWorkspaceApiIntPermission61F11FCE": {
+        "Type": "AWS::Lambda::Permission",
+        "Properties": {}
+      },
+      "ManagementApiGETworkspacesworkspaceIdintegrations440E82D5": {
+        "Type": "AWS::ApiGatewayV2::Route",
+        "Properties": {}
+      },
+      "ManagementApiGETworkspacesworkspaceIdintegrationsgoogleauthurlWorkspaceApiIntPermission062689C9": {
+        "Type": "AWS::Lambda::Permission",
+        "Properties": {}
+      },
+      "ManagementApiGETworkspacesworkspaceIdintegrationsgoogleauthurl71E76271": {
+        "Type": "AWS::ApiGatewayV2::Route",
+        "Properties": {}
+      },
+      "ManagementApiGETworkspacesworkspaceIdintegrationsmicrosoftauthurlWorkspaceApiIntPermission8B424A34": {
+        "Type": "AWS::Lambda::Permission",
+        "Properties": {}
+      },
+      "ManagementApiGETworkspacesworkspaceIdintegrationsmicrosoftauthurl60965229": {
+        "Type": "AWS::ApiGatewayV2::Route",
+        "Properties": {}
+      },
+      "ManagementApiPUTworkspacesworkspaceIdintegrationsnameWorkspaceApiIntPermission6AA2808C": {
+        "Type": "AWS::Lambda::Permission",
+        "Properties": {}
+      },
+      "ManagementApiPUTworkspacesworkspaceIdintegrationsnameCA4B0583": {
+        "Type": "AWS::ApiGatewayV2::Route",
+        "Properties": {}
+      },
+      "ManagementApiDELETEworkspacesworkspaceIdintegrationsnameWorkspaceApiIntPermission56D13C49": {
+        "Type": "AWS::Lambda::Permission",
+        "Properties": {}
+      },
+      "ManagementApiDELETEworkspacesworkspaceIdintegrationsname8025B62C": {
+        "Type": "AWS::ApiGatewayV2::Route",
+        "Properties": {}
+      },
+      "ManagementApiGETworkspacesworkspaceIdcronjobsWorkspaceApiIntPermissionF4F7EB53": {
+        "Type": "AWS::Lambda::Permission",
+        "Properties": {}
+      },
+      "ManagementApiGETworkspacesworkspaceIdcronjobs972F58CE": {
+        "Type": "AWS::ApiGatewayV2::Route",
+        "Properties": {}
+      },
+      "ManagementApiGETworkspacesworkspaceIdusageWorkspaceApiIntPermission059F98EC": {
+        "Type": "AWS::Lambda::Permission",
+        "Properties": {}
+      },
+      "ManagementApiGETworkspacesworkspaceIdusageA09FAB73": {
+        "Type": "AWS::ApiGatewayV2::Route",
+        "Properties": {}
+      },
+      "ManagementApiGETworkspacesworkspaceIdbrowsercookiesWorkspaceApiIntPermission8C7608D5": {
+        "Type": "AWS::Lambda::Permission",
+        "Properties": {}
+      },
+      "ManagementApiGETworkspacesworkspaceIdbrowsercookies0E33137D": {
+        "Type": "AWS::ApiGatewayV2::Route",
+        "Properties": {}
+      },
+      "ManagementApiPUTworkspacesworkspaceIdbrowsercookiesWorkspaceApiIntPermission120EC69C": {
+        "Type": "AWS::Lambda::Permission",
+        "Properties": {}
+      },
+      "ManagementApiPUTworkspacesworkspaceIdbrowsercookiesE26A37EF": {
+        "Type": "AWS::ApiGatewayV2::Route",
+        "Properties": {}
+      },
+      "ManagementApiDELETEworkspacesworkspaceIdbrowsercookiesWorkspaceApiIntPermissionB74A9683": {
+        "Type": "AWS::Lambda::Permission",
+        "Properties": {}
+      },
+      "ManagementApiDELETEworkspacesworkspaceIdbrowsercookiesD32D97FE": {
+        "Type": "AWS::ApiGatewayV2::Route",
+        "Properties": {}
+      },
+      "ManagementApiPOSTworkspacesworkspaceIdagentsWorkspaceApiIntPermission313281C4": {
+        "Type": "AWS::Lambda::Permission",
+        "Properties": {}
+      },
+      "ManagementApiPOSTworkspacesworkspaceIdagents09F7BDF1": {
+        "Type": "AWS::ApiGatewayV2::Route",
+        "Properties": {}
+      },
+      "ManagementApiGETworkspacesworkspaceIdagentsWorkspaceApiIntPermission77801BF2": {
+        "Type": "AWS::Lambda::Permission",
+        "Properties": {}
+      },
+      "ManagementApiGETworkspacesworkspaceIdagentsBD109F99": {
+        "Type": "AWS::ApiGatewayV2::Route",
+        "Properties": {}
+      },
+      "ManagementApiGETworkspacesworkspaceIdagentsagentIdWorkspaceApiIntPermission11DC6EBE": {
+        "Type": "AWS::Lambda::Permission",
+        "Properties": {}
+      },
+      "ManagementApiGETworkspacesworkspaceIdagentsagentIdC9855292": {
+        "Type": "AWS::ApiGatewayV2::Route",
+        "Properties": {}
+      },
+      "ManagementApiPATCHworkspacesworkspaceIdagentsagentIdWorkspaceApiIntPermission631A97CF": {
+        "Type": "AWS::Lambda::Permission",
+        "Properties": {}
+      },
+      "ManagementApiPATCHworkspacesworkspaceIdagentsagentId49D97FB6": {
+        "Type": "AWS::ApiGatewayV2::Route",
+        "Properties": {}
+      },
+      "ManagementApiDELETEworkspacesworkspaceIdagentsagentIdWorkspaceApiIntPermission2AB44AC9": {
+        "Type": "AWS::Lambda::Permission",
+        "Properties": {}
+      },
+      "ManagementApiDELETEworkspacesworkspaceIdagentsagentIdBD69B2A2": {
+        "Type": "AWS::ApiGatewayV2::Route",
+        "Properties": {}
+      },
+      "ManagementApiPOSTworkspacesworkspaceIdagentsagentIddeployWorkspaceApiIntPermissionD1ED5875": {
+        "Type": "AWS::Lambda::Permission",
+        "Properties": {}
+      },
+      "ManagementApiPOSTworkspacesworkspaceIdagentsagentIddeployCBD99A12": {
+        "Type": "AWS::ApiGatewayV2::Route",
+        "Properties": {}
+      },
+      "TaskCleanupFnServiceRoleE86BCB18": {
+        "Type": "AWS::IAM::Role",
+        "Properties": {}
+      },
+      "TaskCleanupFnServiceRoleDefaultPolicy810D4A7A": {
+        "Type": "AWS::IAM::Policy",
+        "Properties": {}
+      },
+      "TaskCleanupFn9882DB1D": {
+        "Type": "AWS::Lambda::Function",
+        "Properties": {
+          "Environment": {
+            "Variables": {
+              "WORKSPACES_TABLE": {
+                "Fn::ImportValue": "Storage:ExportsOutputRefWorkspaces72022D37A407F0AE"
+              },
+              "PLATFORM_ENV": "prod",
+              "LOG_LEVEL": "INFO"
+            }
+          }
+        }
+      },
+      "EcsTaskStateChangeRuleC4D798EC": {
+        "Type": "AWS::Events::Rule",
+        "Properties": {
+          "Name": "selfhost-ecs-state-change"
+        }
+      },
+      "EcsTaskStateChangeRuleAllowEventRuleManagementApiTaskCleanupFn9DC877481574C636": {
+        "Type": "AWS::Lambda::Permission",
+        "Properties": {}
+      }
+    }
+  },
+  "llmGateway": {
+    "parameters": {
+      "BootstrapVersion": {
+        "Type": "AWS::SSM::Parameter::Value<String>",
+        "Default": "/cdk-bootstrap/hnb659fds/version"
+      }
+    },
+    "resources": {
+      "GwCluster64D6AFEA": {
+        "Type": "AWS::ECS::Cluster",
+        "Properties": {}
+      },
+      "GwTaskTaskRoleB8596653": {
+        "Type": "AWS::IAM::Role",
+        "Properties": {}
+      },
+      "GwTaskTaskRoleDefaultPolicy6952C604": {
+        "Type": "AWS::IAM::Policy",
+        "Properties": {}
+      },
+      "GwTaskD248B2F2": {
+        "Type": "AWS::ECS::TaskDefinition",
+        "Properties": {}
+      },
+      "GwTasklitellmLogGroup0F874F06": {
+        "Type": "AWS::Logs::LogGroup",
+        "Properties": {}
+      },
+      "GwTaskExecutionRoleAB1F355C": {
+        "Type": "AWS::IAM::Role",
+        "Properties": {}
+      },
+      "GwTaskExecutionRoleDefaultPolicyE6EBDF6E": {
+        "Type": "AWS::IAM::Policy",
+        "Properties": {}
+      },
+      "GwSvcSg7CB6B058": {
+        "Type": "AWS::EC2::SecurityGroup",
+        "Properties": {}
+      },
+      "GwSvcSgfromNetworkAlbSgAA4563F04000ACEF1DBA": {
+        "Type": "AWS::EC2::SecurityGroupIngress",
+        "Properties": {}
+      },
+      "GwService30FF6ACF": {
+        "Type": "AWS::ECS::Service",
+        "Properties": {}
+      },
+      "GwServiceTaskCountTargetB8E4FD32": {
+        "Type": "AWS::ApplicationAutoScaling::ScalableTarget",
+        "Properties": {}
+      },
+      "GwServiceTaskCountTargetCpuCDEB46FB": {
+        "Type": "AWS::ApplicationAutoScaling::ScalingPolicy",
+        "Properties": {}
+      },
+      "GwTg73392085": {
+        "Type": "AWS::ElasticLoadBalancingV2::TargetGroup",
+        "Properties": {}
+      },
+      "GwRule3A655A03": {
+        "Type": "AWS::ElasticLoadBalancingV2::ListenerRule",
+        "Properties": {}
+      }
+    }
+  }
+}

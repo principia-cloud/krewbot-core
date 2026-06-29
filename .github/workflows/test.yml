@@ -1,0 +1,99 @@
+name: Test
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  cdk-tests:
+    name: CDK snapshot tests
+    runs-on: ubuntu-latest
+    # Playwright is a transitive dep of the chat-server (built by `prepare`).
+    # Skip its postinstall browser download — CI doesn't run browser tests
+    # here and the binaries are ~500MB.
+    env:
+      PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: "1"
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+
+      # npm install (not npm ci) — the committed lockfile predates the
+      # current runner's npm version and `npm ci`'s stricter check
+      # rejects it. The lockfile contents are still authoritative; npm
+      # install reuses them when the package.json hasn't changed.
+      - run: npm install --no-audit --no-fund
+
+      - run: npm run test:cdk
+
+      # If snapshots drifted, print the diff so the PR author can see
+      # exactly what changed and re-run with UPDATE_CDK_SNAPSHOTS=1 if
+      # intentional.
+      - name: Show snapshot diff on failure
+        if: failure()
+        run: |
+          git diff --no-color -- 'tests/cdk/snapshots/**' || true
+
+  python-tests:
+    name: Python tests (unit + secret-propagation integ)
+    runs-on: ubuntu-latest
+    # The propagation integ test spawns the chat-server's real
+    # secrets-watcher via `node --import tsx`, so the chat-server's
+    # node_modules (specifically `tsx`) must exist on the runner before
+    # pytest runs. Without it the integ test self-skips, hiding any
+    # regression in the Python -> Node seam.
+    env:
+      PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: "1"
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: tests/python/requirements-test.txt
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: docker/agent/chat-server/package-lock.json
+
+      - name: Install chat-server deps (provides tsx for the integ test)
+        working-directory: docker/agent/chat-server
+        run: npm install --no-audit --no-fund
+
+      - run: pip install -r tests/python/requirements-test.txt
+
+      - run: pytest tests/python -v
+
+  chat-server-tests:
+    name: Chat-server tests (unit + real-CLI bash-background integ)
+    runs-on: ubuntu-latest
+    # Includes bash-background-integ.test.ts, which spawns the REAL Claude
+    # CLI bundled with the agent SDK against a local mock Anthropic API —
+    # no credentials or network egress needed.
+    env:
+      PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: "1"
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: docker/agent/chat-server/package-lock.json
+
+      - name: Install chat-server deps
+        working-directory: docker/agent/chat-server
+        run: npm install --no-audit --no-fund
+
+      - name: Run chat-server test suite
+        working-directory: docker/agent/chat-server
+        run: npm test

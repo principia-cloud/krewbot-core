@@ -1,0 +1,9 @@
+mcp==1.26.0
+httpx==0.28.1
+playwright==1.49.1
+python-json-logger==3.2.1
+# Google Workspace MCP (taylorwilsdon/google_workspace_mcp). Replaces the
+# npm google-workspace-mcp: native --tools/--tool-tier catalog filtering
+# (22 tools / ~42 KB at gmail,drive,calendar,docs,sheets @ core vs the old
+# unfilterable ~75 tools / ~105 KB).
+workspace-mcp==1.21.2

@@ -1,0 +1,7 @@
+pytest>=7.0
+pydantic==2.9.2
+boto3>=1.34
+# moto powers the secret-propagation integ test (mocks SecretsManager + SSM
+# end-to-end so the real sidecar sync code drives the real chat-server
+# fs.watch over a tmp /config dir).
+moto[secretsmanager,ssm]>=5.0

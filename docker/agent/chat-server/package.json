@@ -1,0 +1,32 @@
+{
+  "name": "platform-chat-server",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "test": "node --import tsx --test test/*.test.ts"
+  },
+  "dependencies": {
+    "@anthropic-ai/claude-agent-sdk": "0.3.168",
+    "@chat-adapter/slack": "^4.24.0",
+    "@chat-adapter/state-memory": "^4.24.0",
+    "@chat-adapter/teams": "^4.24.0",
+    "@chat-adapter/telegram": "^4.24.0",
+    "@chat-adapter/whatsapp": "^4.24.0",
+    "adm-zip": "^0.5.17",
+    "chat": "^4.24.0",
+    "jose": "^6.0.11",
+    "langfuse": "^3.38.0",
+    "pino": "^9.5.0",
+    "playwright": "^1.59.1"
+  },
+  "devDependencies": {
+    "@types/adm-zip": "^0.5.8",
+    "@types/node": "^22.0.0",
+    "pino-pretty": "^11.3.0",
+    "tsx": "^4.21.0",
+    "typescript": "^5.7.0"
+  }
+}

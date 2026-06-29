@@ -1,0 +1,9 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "Stub workspace template used only by tests to satisfy ManagementApiStack's S3Asset.fromFile.",
+  "Resources": {
+    "TestPlaceholder": {
+      "Type": "AWS::CloudFormation::WaitConditionHandle"
+    }
+  }
+}

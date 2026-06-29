@@ -1,0 +1,186 @@
+{
+  "parameters": {
+    "WorkspaceId": {
+      "Type": "String"
+    },
+    "UidGid": {
+      "Type": "Number"
+    },
+    "FileSystemId": {
+      "Type": "String"
+    },
+    "ClusterName": {
+      "Type": "String"
+    },
+    "VpcId": {
+      "Type": "AWS::EC2::VPC::Id"
+    },
+    "SubnetId": {
+      "Type": "AWS::EC2::Subnet::Id"
+    },
+    "SidecarSgId": {
+      "Type": "AWS::EC2::SecurityGroup::Id"
+    },
+    "AgentRepoArn": {
+      "Type": "String"
+    },
+    "SidecarRepoArn": {
+      "Type": "String"
+    },
+    "JwksUrl": {
+      "Type": "String"
+    },
+    "AlbListenerArn": {
+      "Type": "String"
+    },
+    "ListenerRulePriority": {
+      "Type": "Number"
+    },
+    "DomainName": {
+      "Type": "String"
+    },
+    "CognitoUserPoolId": {
+      "Type": "String"
+    },
+    "CognitoClientId": {
+      "Type": "String"
+    },
+    "AgentPlatformApiUrl": {
+      "Type": "String"
+    },
+    "AppUrl": {
+      "Type": "String"
+    },
+    "LlmGatewayUrl": {
+      "Type": "String",
+      "Default": ""
+    },
+    "AgentName": {
+      "Type": "String"
+    },
+    "PlatformEnv": {
+      "Type": "String"
+    },
+    "PlatformConfigSsmName": {
+      "Type": "String"
+    },
+    "BootstrapVersion": {
+      "Type": "AWS::SSM::Parameter::Value<String>",
+      "Default": "/cdk-bootstrap/hnb659fds/version"
+    }
+  },
+  "resources": {
+    "DataAccessPoint": {
+      "Type": "AWS::EFS::AccessPoint",
+      "Properties": {}
+    },
+    "UserContextAccessPoint": {
+      "Type": "AWS::EFS::AccessPoint",
+      "Properties": {}
+    },
+    "ConfigAccessPoint": {
+      "Type": "AWS::EFS::AccessPoint",
+      "Properties": {}
+    },
+    "CronTriggerSecret5CCA7048": {
+      "Type": "AWS::SecretsManager::Secret",
+      "Properties": {
+        "Name": {
+          "Fn::Sub": "selfhost/${WorkspaceId}/cron-trigger-key"
+        }
+      }
+    },
+    "CronConnection": {
+      "Type": "AWS::Events::Connection",
+      "Properties": {
+        "Name": {
+          "Fn::Sub": "selfhost-cron-conn-${WorkspaceId}"
+        }
+      }
+    },
+    "CronApiDestination": {
+      "Type": "AWS::Events::ApiDestination",
+      "Properties": {
+        "Name": {
+          "Fn::Sub": "selfhost-cron-dest-${WorkspaceId}"
+        }
+      }
+    },
+    "CronInvokeRole965B54DA": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "RoleName": {
+          "Fn::Sub": "selfhost-cron-invoke-${WorkspaceId}"
+        }
+      }
+    },
+    "CronInvokeRoleDefaultPolicy2841C94A": {
+      "Type": "AWS::IAM::Policy",
+      "Properties": {}
+    },
+    "SandboxTaskDefTaskRole674B9588": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {}
+    },
+    "SandboxTaskDef66EDCEA1": {
+      "Type": "AWS::ECS::TaskDefinition",
+      "Properties": {}
+    },
+    "SandboxTaskDefExecutionRoleB5586322": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {}
+    },
+    "SandboxTaskDefExecutionRoleDefaultPolicy8BB193D9": {
+      "Type": "AWS::IAM::Policy",
+      "Properties": {}
+    },
+    "SandboxTaskDefAgentLogs8667BD10": {
+      "Type": "AWS::Logs::LogGroup",
+      "Properties": {}
+    },
+    "SidecarTaskDefTaskRoleF6D2FD18": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {}
+    },
+    "SidecarTaskDefTaskRoleDefaultPolicyB2C6F3E1": {
+      "Type": "AWS::IAM::Policy",
+      "Properties": {}
+    },
+    "SidecarTaskDef496A955B": {
+      "Type": "AWS::ECS::TaskDefinition",
+      "Properties": {}
+    },
+    "SidecarTaskDefExecutionRole8490B628": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {}
+    },
+    "SidecarTaskDefExecutionRoleDefaultPolicy6826215B": {
+      "Type": "AWS::IAM::Policy",
+      "Properties": {}
+    },
+    "SidecarTaskDefSidecarLogs1A96168F": {
+      "Type": "AWS::Logs::LogGroup",
+      "Properties": {}
+    },
+    "SandboxTargetGroup": {
+      "Type": "AWS::ElasticLoadBalancingV2::TargetGroup",
+      "Properties": {
+        "Name": {
+          "Fn::Sub": "leo-tg-${WorkspaceId}"
+        }
+      }
+    },
+    "SandboxListenerRule": {
+      "Type": "AWS::ElasticLoadBalancingV2::ListenerRule",
+      "Properties": {}
+    },
+    "SandboxService539273E8": {
+      "Type": "AWS::ECS::Service",
+      "Properties": {}
+    },
+    "SidecarService29BE309E": {
+      "Type": "AWS::ECS::Service",
+      "Properties": {}
+    }
+  }
+}
