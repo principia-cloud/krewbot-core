@@ -400,6 +400,12 @@ Sign in at `https://<overlay-subdomain>.example.com/login`, set a real password,
 
 ## 🖼 In action
 
+**💬 Chat with your workspace agent** — from the web, or from Slack, WhatsApp, and Telegram. The agent answers from your team's knowledge, runs code, drives a browser, and acts on a schedule.
+
+<div align="center">
+<img src="docs/images/chat.png" alt="Workspace chat with the agent" width="760" />
+</div>
+
 <table>
 <tr>
 <td width="50%" valign="top">
