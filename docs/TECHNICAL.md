@@ -2,7 +2,7 @@
 
 Everything an engineer needs to deploy, configure, and customize the platform. For the product overview, see the [main README](../README.md).
 
-Core is **brand-neutral and composable**: you deploy it as-is, or wrap it in a thin *overlay* repo that adds your own branding, billing, and auth through documented composition points. With zero overlay code you get a working single-button Cognito sign-in and a minimal onboarding flow.
+You deploy core as-is, or wrap it in a thin *overlay* repo that layers in your own billing, auth, and UI through documented composition points (Lambda hooks, frontend extension slots, and config). Run with no overlay and core uses its own neutral defaults — a single-button Cognito sign-in and a minimal onboarding flow.
 
 ---
 
